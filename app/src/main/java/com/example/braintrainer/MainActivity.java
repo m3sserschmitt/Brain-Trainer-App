@@ -11,10 +11,11 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.braintrainer.databinding.ActivityMainBinding;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
 
-    private static final int defaultTime = 10;
-    private static final int defaultMode = 0;
+    private static final int defaultTime = 30;
 
     private SharedPreferences appSettings;
 
@@ -29,13 +30,6 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        int mode = appSettings.getInt("mode", -1);
-
-        if(mode < 0)
-        {
-            editor.putInt("mode", defaultMode);
-            editor.apply();
-        }
     }
 
     @Override
@@ -46,12 +40,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                R.id.navigation_play, R.id.navigation_settings, R.id.navigation_records)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-
+        Objects.requireNonNull(this.getSupportActionBar()).hide();
         appSettings = getSharedPreferences("com.example.braintrainer", MODE_PRIVATE);
 
         initialAppSettings();

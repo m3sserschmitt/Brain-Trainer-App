@@ -1,4 +1,4 @@
-package com.example.braintrainer.ui.home;
+package com.example.braintrainer.ui.game;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -21,12 +21,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.example.braintrainer.R;
 import com.example.braintrainer.database.AppDatabase;
 import com.example.braintrainer.database.Record;
 import com.example.braintrainer.database.RecordDao;
-import com.example.braintrainer.databinding.FragmentHomeBinding;
+import com.example.braintrainer.databinding.FragmentGameBinding;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -35,12 +36,14 @@ import java.util.concurrent.Executors;
 
 public class PlayFragment extends Fragment {
 
-    private FragmentHomeBinding binding;
+    private FragmentGameBinding binding;
 
-    private Context activity;
+    private FragmentActivity activity;
 
     private SharedPreferences appSettings;
     private static AppDatabase databaseInstance;
+
+    private CountDownTimer timer;
 
     private int correctAnswerPosition;
 
@@ -64,7 +67,12 @@ public class PlayFragment extends Fragment {
 
     private void showTime(int time)
     {
-        binding.timeTextView.setText(time + "s");
+        try {
+            binding.timeTextView.setText(time + "s");
+        } catch (Exception e)
+        {
+            timer.cancel();
+        }
     }
 
     private void resetTime()
@@ -76,6 +84,7 @@ public class PlayFragment extends Fragment {
 
     private void resetGame()
     {
+        gameStartedLayout();
         resetScore();
         resetTime();
     }
@@ -209,7 +218,8 @@ public class PlayFragment extends Fragment {
             Record best = recordDao.getBest(currentTime);
 
             handler.post(() -> {
-                if(best == null || best.smallerThan(correctAnswers, currentTime))
+                if(correctAnswers != 0 &&
+                        (best == null || best.smallerThan(correctAnswers, currentTime)))
                 {
                     saveLastScore();
                 }
@@ -223,7 +233,7 @@ public class PlayFragment extends Fragment {
 
         if(time > 0)
         {
-            new CountDownTimer((long)time * 1000, 1000) {
+            timer = new CountDownTimer((long)time * 1000, 1000) {
 
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -236,14 +246,15 @@ public class PlayFragment extends Fragment {
                     gameEndedLayout();
                     checkRecords();
                 }
-            }.start();
+            };
+
+            timer.start();
         }
     }
 
     public void startGame()
     {
         resetGame();
-        gameStartedLayout();
         generateProblem();
         startTimer();
     }
@@ -270,7 +281,7 @@ public class PlayFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 //        HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentGameBinding.inflate(inflater, container, false);
 
 
         activity = requireActivity();

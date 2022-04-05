@@ -56,6 +56,11 @@ public class Record {
 
     public boolean smallerThan(int correctAnswers, int time)
     {
+        if(correctAnswers == 0)
+        {
+            return false;
+        }
+
         if(this.time != time)
         {
             return false;

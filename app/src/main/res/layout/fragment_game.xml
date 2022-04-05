@@ -4,15 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:onClick="startGame"
-    tools:context=".ui.home.PlayFragment">
+    tools:context=".ui.game.PlayFragment">
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:onClick="startGame"
         android:text="@string/start"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -49,6 +47,7 @@
         android:id="@+id/problemTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:text="@string/ready"
         android:textAlignment="center"
         android:textSize="34sp"
