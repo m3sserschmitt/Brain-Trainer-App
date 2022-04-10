@@ -2,7 +2,9 @@ package com.example.braintrainer;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -10,6 +12,9 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.braintrainer.databinding.ActivityMainBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 
@@ -19,16 +24,36 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences appSettings;
 
-    private void initialAppSettings()
-    {
+    private void initialAppSettings() {
         int time = appSettings.getInt("time", -1);
         SharedPreferences.Editor editor = appSettings.edit();
 
-        if(time < 0)
-        {
+        if (time < 0) {
             editor.putInt("time", defaultTime);
             editor.apply();
         }
+
+    }
+
+    private void getFcmToken() {
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            System.out.println("Fetching FCM registration token failed");
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        System.out.println("Your device registration token :"+token);
+                        Toast.makeText(MainActivity.this,"Your device registration token : " + token, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
 
@@ -49,5 +74,7 @@ public class MainActivity extends AppCompatActivity {
         appSettings = getSharedPreferences("com.example.braintrainer", MODE_PRIVATE);
 
         initialAppSettings();
+        getFcmToken();
+
     }
 }
