@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import android.content.Intent;
+
 public class RecordAdapter extends
         RecyclerView.Adapter<RecordAdapter.RecordViewHolder> implements Filterable {
 
@@ -32,6 +34,7 @@ public class RecordAdapter extends
 
     private final List<RecordItem> recordList;
     private final List<RecordItem> recordListFull;
+    private final Context cxt;
 
     static class RecordViewHolder extends RecyclerView.ViewHolder
     {
@@ -54,6 +57,7 @@ public class RecordAdapter extends
         recordListFull = new ArrayList<>(records);
 
         databaseInstance = AppDatabase.getInstance(context);
+        this.cxt = context;
     }
 
     @NonNull
@@ -106,11 +110,22 @@ public class RecordAdapter extends
         holder.shareButton.setOnClickListener(v -> {
             String textToShare = v.getTag().toString();
 
-            Log.i("share_button_pressed", textToShare);
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, textToShare);
+            sendIntent.setType("text/plain");
 
-            // ToDo: implement data sharing functionality
+            Intent shareIntent = Intent.createChooser(sendIntent, null);
+            cxt.startActivity(shareIntent);
+
+
         });
+
+
     }
+
+
+
 
     @Override
     public int getItemCount() {
